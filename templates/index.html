@@ -93,6 +93,7 @@
 
         <form id="approvalForm">
             <input type="hidden" id="message_uuid" name="message_uuid" value="{{ message_uuid }}" >
+            <input type="hidden" id="returnurl" name="returnurl" value="{{ returnurl }}" >
             {% for xml_doc in xml_list %}
             <div class="xml-block">
                 <h4>{{ xml_doc.title }}</h4>
@@ -175,6 +176,14 @@
                 `;
                 console.log('Ответ сервера:', data);
                 messageDiv.scrollIntoView({ behavior: 'smooth' });
+            })
+            .then(data => {
+                const returnurl = document.getElementById('returnurl').value;
+                if (returnurl) {
+                    setTimeout(() => {
+                    window.location.href = returnurl;
+                    }, 1500);
+                }
             })
             .catch(error => {
                 const messageDiv = document.getElementById('resultMessage');

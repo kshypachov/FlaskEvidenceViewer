@@ -131,7 +131,7 @@ def evidense_previewer(message_uuid):
 
     print(xml_list)
 
-    return render_template("index.html", xml_list=xml_list, message_uuid=message_uuid)
+    return render_template("index.html", xml_list=xml_list, message_uuid=message_uuid, returnurl=returnurl)
 
 
 @app.route('/submit', methods=['POST'])
