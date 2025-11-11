@@ -1,12 +1,33 @@
 # from idlelib import query
 from flask import Flask, request, render_template, jsonify
-from flask_bootstrap5 import Bootstrap
+#from flask_bootstrap5 import Bootstrap
 import xml.etree.ElementTree as ET
 import redis
 import json
 import settings
+import logging
+import sys
+
+
+# Зчитування параметрів додатку з конфігураційного файлу
+conf = settings.Config('config.ini')
+
+# Налаштування логування
+try:
+    settings.configure_logging(conf)
+    logger = logging.getLogger(__name__)
+    logger.info("Логування налаштовано успішно.")
+except Exception as e:
+    # Якщо виникає помилка при налаштуванні логування, додаток припиняє роботу
+    print(f"Помилка налаштування логування: {e}")
+    print(f"Програму зупинено!")
+
+logger.debug("Початок ініціалізації додатку")
+
 
 app = Flask(__name__)
+logger = logging.getLogger(__name__)
+logger.info("Додаток Flask ініціалізовано.")
 
 @app.template_filter('fromstring')
 def fromstring_filter(xml_string):
@@ -103,7 +124,7 @@ def evidense_previewer(message_uuid):
     print(message_uuid)
     print(returnurl)
 
-    redis_conn = conn_to_redis(settings.REDIS_HOST, settings.REDIS_PORT, settings.REDIS_DB)
+    redis_conn = conn_to_redis(conf.redis_host, conf.redis_port, conf.redis_db)
     data = get_data_from_redis(message_uuid, redis_conn)
     redis_conn.close()
 
@@ -146,7 +167,7 @@ def submit_approvals():
         print(f"  Документ {doc_id}: {'Одобрен' if is_approved else 'Не одобрен'}")
 
     # Здесь можно добавить логику сохранения в базу данных или файл
-    redis_conn = conn_to_redis(settings.REDIS_HOST, settings.REDIS_PORT, settings.REDIS_DB)
+    redis_conn = conn_to_redis(conf.redis_host, conf.redis_port, conf.redis_db)
     if redis_conn is None:
         return jsonify({"status": "error", "message": "Redis connection failed"}), 500
     json_data = get_data_from_redis(data["message_uuid"], redis_conn)
