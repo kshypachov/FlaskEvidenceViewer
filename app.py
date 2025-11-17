@@ -1,6 +1,4 @@
-# from idlelib import query
 from flask import Flask, request, render_template, jsonify
-#from flask_bootstrap5 import Bootstrap
 import xml.etree.ElementTree as ET
 import redis
 import json
@@ -31,11 +29,11 @@ logger.info("Додаток Flask ініціалізовано.")
 
 @app.template_filter('fromstring')
 def fromstring_filter(xml_string):
-    """Парсит XML-строку в ElementTree.Element для использования в шаблоне"""
+    """Розбирає XML-рядок у ElementTree.Element для використання в шаблоні"""
     try:
         return ET.fromstring(xml_string)
     except ET.ParseError as e:
-        print(f"Ошибка парсинга XML: {e}")
+        print(f"Помилка парсингу XML: {e}")
         return None
 
 def conn_to_redis(redis_host, redis_port, redis_db):
@@ -48,7 +46,7 @@ def conn_to_redis(redis_host, redis_port, redis_db):
             socket_timeout=5,
             socket_connect_timeout=5
         )
-        # check connection
+        # перевірка з'єднання
         redis_client.ping()
         return redis_client
     except redis.ConnectionError as e:
@@ -57,7 +55,7 @@ def conn_to_redis(redis_host, redis_port, redis_db):
         return redis_client
 
 def get_data_from_redis(message_uuid, redis_client):
-    """Get data from Redis by message_uuid"""
+    """Отримати дані з Redis за message_uuid"""
     if redis_client is None:
         print("Redis client is not connected. Aborting.")
         return None
@@ -67,7 +65,7 @@ def get_data_from_redis(message_uuid, redis_client):
     print(f"Get data from Redis by id: {redis_key}")
 
     try:
-        # Get dara from Redis
+        # Отримати дані з Redis
         data = redis_client.get(redis_key)
 
         if data is None:
@@ -81,7 +79,7 @@ def get_data_from_redis(message_uuid, redis_client):
             json_data = json.loads(data)
             return json_data
         except json.JSONDecodeError:
-            # if not JSON, return as is
+            # якщо не JSON, повернути як є
             return data
 
     except redis.RedisError as e:
@@ -93,7 +91,7 @@ def get_data_from_redis(message_uuid, redis_client):
 
 
 def parse_xml_to_dict(element):
-    """Преобразует XML-элемент в словарь."""
+    """Перетворює XML-елемент у словник."""
     node = {}
     if element.text and element.text.strip():
         node["__text"] = element.text.strip()
@@ -107,19 +105,19 @@ def parse_xml_to_dict(element):
 @app.route('/<message_uuid>')
 def evidense_previewer(message_uuid):
 
-    # Get returnurl parameter from URL
+    # Отримати параметр returnurl з URL
     returnurl = request.args.get("returnurl")
 
-    # show error if returnurl is not provided
+    # показати помилку, якщо returnurl не вказано
     if not returnurl:
         return render_template("error.html",
-                               error_message="Отсутствует обязательный параметр 'returnurl'",
-                               error_details="URL должен содержать параметр returnurl. Пример: /?returnurl=https://example.com"), 400
-    # show error if message_uuid is not provided
+                               error_message="Missing required parameter 'returnurl'",
+                               error_details="URL must include the returnurl parameter. Example: /?returnurl=https://example.com"), 400
+    # показати помилку, якщо message_uuid не вказано
     if not message_uuid:
         return render_template("error.html",
-                               error_message="Отсутствует обязательный параметр 'message_uuid'",
-                               error_details="URL должен содержать message_uuid. Пример: /3245234089573246345"), 400
+                               error_message="Missing required parameter 'message_uuid'",
+                               error_details="URL must contain message_uuid. Example: /3245234089573246345"), 400
 
     print(message_uuid)
     print(returnurl)
@@ -141,7 +139,7 @@ def evidense_previewer(message_uuid):
 
 
     print(data)
-    # List for XMLs
+    # Список для XML
     xml_list = []
 
     for evidence in data["evidences"]:
@@ -157,23 +155,23 @@ def evidense_previewer(message_uuid):
 
 @app.route('/submit', methods=['POST'])
 def submit_approvals():
-    """Обрабатывает отправку состояний чекбоксов"""
+    """Опрацьовує відправку станів чекбоксів"""
     data = request.get_json()
     print(data)
     approvals = data.get('approvals', {})
 
-    print("Получены состояния апрувов:")
+    print("Received approval states:")
     for doc_id, is_approved in approvals.items():
-        print(f"  Документ {doc_id}: {'Одобрен' if is_approved else 'Не одобрен'}")
+        print(f"  Document {doc_id}: {'Approved' if is_approved else 'Not approved'}")
 
-    # Здесь можно добавить логику сохранения в базу данных или файл
+    # Тут можна додати логіку збереження в базу даних або файл
     redis_conn = conn_to_redis(conf.redis_host, conf.redis_port, conf.redis_db)
     if redis_conn is None:
         return jsonify({"status": "error", "message": "Redis connection failed"}), 500
     json_data = get_data_from_redis(data["message_uuid"], redis_conn)
 
 
-    print("Получены состояния апрувов:")
+    print("Received approval states:")
     for doc_id, is_approved in approvals.items():
 
         for evidence in json_data["evidences"]:
@@ -188,7 +186,7 @@ def submit_approvals():
 
     return jsonify({
         "status": "success",
-        "message": "Апрувы успешно сохранены",
+        "message": "Approvals saved successfully",
         "approvals": approvals
     })
 

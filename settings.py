@@ -80,8 +80,3 @@ def configure_logging(config_instance):
             level=log_level,
             handlers=[logging.StreamHandler()]  # Вывод в stdout
         )
-
-
-# REDIS_HOST = '192.168.99.121'
-# REDIS_PORT = 6379
-# REDIS_DB = 0

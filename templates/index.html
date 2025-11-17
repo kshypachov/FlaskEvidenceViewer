@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -103,7 +103,7 @@
                     {% if root %}
                         {{ render_tree(root, loop.index ~ '-0-')|safe }}
                     {% else %}
-                        <div class="alert alert-danger">Ошибка парсинга XML</div>
+                        <div class="alert alert-danger">XML parsing error</div>
                     {% endif %}
                 </div>
                 <div class="approval-checkbox">
@@ -170,11 +170,11 @@
                 const messageDiv = document.getElementById('resultMessage');
                 messageDiv.innerHTML = `
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <strong>✓ Успешно!</strong> ${data.message}
+                        <strong>✓ Success!</strong> ${data.message}
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 `;
-                console.log('Ответ сервера:', data);
+                console.log('Server answer:', data);
                 messageDiv.scrollIntoView({ behavior: 'smooth' });
             })
             .then(data => {
@@ -189,11 +189,11 @@
                 const messageDiv = document.getElementById('resultMessage');
                 messageDiv.innerHTML = `
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <strong>✗ Ошибка!</strong> Не удалось отправить данные.
+                        <strong>✗ Error!</strong> Can't send data to the server.
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 `;
-                console.error('Ошибка:', error);
+                console.error('Error:', error);
             });
         });
     </script>
