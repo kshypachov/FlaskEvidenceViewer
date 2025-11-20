@@ -22,7 +22,7 @@ except Exception as e:
     print(f"Помилка налаштування логування: {e}")
     print(f"Програму зупинено!")
 
-logger.info("Starting app...")
+logger.debug("Початок ініціалізації додатку")
 
 app = Flask(__name__)
 logger.info("Додаток Flask ініціалізовано.")
@@ -39,7 +39,7 @@ def fromstring_filter(xml_string):
 def conn_to_redis(redis_url):
     try:
         logger.info(f"Connecting to Redis at {redis_url}")
-        redis_client = redis.Redis.from_url(redis_url);
+        redis_client = redis.Redis.from_url(redis_url)
 
         # check connection
         redis_client.ping()
@@ -107,13 +107,13 @@ def evidense_previewer(message_uuid):
     # show error if returnurl is not provided
     if not returnurl:
         return render_template("error.html",
-                               error_message="Отсутствует обязательный параметр 'returnurl'",
-                               error_details="URL должен содержать параметр returnurl. Пример: /?returnurl=https://example.com"), 400
+                               error_message="Відсутній обовʼязковий параметр 'returnurl'",
+                               error_details="URL повинен містити параметр returnurl. Приклад: /?returnurl=https://example.com"), 400
     # show error if message_uuid is not provided
     if not message_uuid:
         return render_template("error.html",
-                               error_message="Отсутствует обязательный параметр 'message_uuid'",
-                               error_details="URL должен содержать message_uuid. Пример: /3245234089573246345"), 400
+                               error_message="Відсутній обовʼязковий параметр 'message_uuid'",
+                               error_details="URL повинен містити параметр message_uuid. Приклад: /3245234089573246345"), 400
 
     print(message_uuid)
     print(returnurl)
@@ -158,7 +158,7 @@ def submit_approvals():
 
     print("Получены состояния апрувов:")
     for doc_id, is_approved in approvals.items():
-        print(f"  Документ {doc_id}: {'Одобрен' if is_approved else 'Не одобрен'}")
+        print(f"  Документ {doc_id}: {'Затверджено' if is_approved else 'Не затверджено'}")
 
     # Здесь можно добавить логику сохранения в базу данных или файл
     redis_conn = conn_to_redis(conf.redis_url)
