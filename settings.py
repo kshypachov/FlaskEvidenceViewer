@@ -43,6 +43,7 @@ class Config:
         self.redis_host = get_config_value('redis', 'host', required=True)
         self.redis_port = get_config_value('redis', 'port', required=True)
         self.redis_db = get_config_value('redis', 'db', required=True)
+        self.redis_ttl = get_config_value('redis', 'ttl', required=3600)
         # Параметри логування
         self.log_filename = get_config_value('logging', 'filename')
         self.log_filemode = get_config_value('logging', 'filemode', 'a')
@@ -80,3 +81,8 @@ def configure_logging(config_instance):
             level=log_level,
             handlers=[logging.StreamHandler()]  # Вывод в stdout
         )
+
+
+# REDIS_HOST = '192.168.99.121'
+# REDIS_PORT = 6379
+# REDIS_DB = 0
