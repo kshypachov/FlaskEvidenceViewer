@@ -40,10 +40,8 @@ class Config:
 
         # Зчитування конфігурації
         # База даних Redis
-        self.redis_host = get_config_value('redis', 'host', required=True)
-        self.redis_port = get_config_value('redis', 'port', required=True)
-        self.redis_db = get_config_value('redis', 'db', required=True)
-        self.redis_ttl = get_config_value('redis', 'ttl', required=3600)
+        self.redis_url = get_config_value('redis', 'url', required=True)
+        self.redis_ttl = get_config_value('redis', 'ttl', default=3600)
         # Параметри логування
         self.log_filename = get_config_value('logging', 'filename')
         self.log_filemode = get_config_value('logging', 'filemode', 'a')

@@ -22,11 +22,9 @@ except Exception as e:
     print(f"Помилка налаштування логування: {e}")
     print(f"Програму зупинено!")
 
-logger.debug("Початок ініціалізації додатку")
-
+logger.info("Starting app...")
 
 app = Flask(__name__)
-logger = logging.getLogger(__name__)
 logger.info("Додаток Flask ініціалізовано.")
 
 @app.template_filter('fromstring')
@@ -35,24 +33,20 @@ def fromstring_filter(xml_string):
     try:
         return ET.fromstring(xml_string)
     except ET.ParseError as e:
-        print(f"Ошибка парсинга XML: {e}")
+        logger.error(f"XML parsing error: {e}")
         return None
 
-def conn_to_redis(redis_host, redis_port, redis_db):
+def conn_to_redis(redis_url):
     try:
-        redis_client = redis.Redis(
-            host=redis_host,
-            port=redis_port,
-            db=redis_db,
-            decode_responses=True,
-            socket_timeout=5,
-            socket_connect_timeout=5
-        )
+        logger.info(f"Connecting to Redis at {redis_url}")
+        redis_client = redis.Redis.from_url(redis_url);
+
         # check connection
         redis_client.ping()
+
         return redis_client
     except redis.ConnectionError as e:
-        print(f"Error connecting to Redis: {e}")
+        logger.critical(f"Error connecting to Redis: {e}")
         redis_client = None
         return redis_client
 
@@ -124,7 +118,7 @@ def evidense_previewer(message_uuid):
     print(message_uuid)
     print(returnurl)
 
-    redis_conn = conn_to_redis(conf.redis_host, conf.redis_port, conf.redis_db)
+    redis_conn = conn_to_redis(conf.redis_url)
     data = get_data_from_redis(message_uuid, redis_conn)
     redis_conn.close()
 
@@ -167,7 +161,7 @@ def submit_approvals():
         print(f"  Документ {doc_id}: {'Одобрен' if is_approved else 'Не одобрен'}")
 
     # Здесь можно добавить логику сохранения в базу данных или файл
-    redis_conn = conn_to_redis(conf.redis_host, conf.redis_port, conf.redis_db)
+    redis_conn = conn_to_redis(conf.redis_url)
     if redis_conn is None:
         return jsonify({"status": "error", "message": "Redis connection failed"}), 500
     json_data = get_data_from_redis(data["message_uuid"], redis_conn)
