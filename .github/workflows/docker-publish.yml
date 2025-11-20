@@ -2,7 +2,7 @@ name: Docker Build and Push
 
 on:
   push:
-    branches: [ "main" ] # Або "master", залежно від вашої основної гілки
+    branches: [ "master" ] # Або "master", залежно від вашої основної гілки
     tags: [ 'v*.*.*' ]   # Запускати також при створенні тегів (наприклад, v1.0.0)
   pull_request:
     branches: [ "main" ]
