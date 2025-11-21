@@ -182,7 +182,7 @@ def submit_approvals():
 
     return jsonify({
         "status": "success",
-        "message": "Апрувы успешно сохранены",
+        "message": "Approvals received",
         "approvals": approvals
     })
 
